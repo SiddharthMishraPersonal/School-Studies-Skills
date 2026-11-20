@@ -1,0 +1,11 @@
+{
+  "name": "saxon-algebra-1",
+  "description": "Saxon Algebra 1: builds lesson-focused problem set PDFs and solves screenshots of book pages with step-by-step solution PDFs.",
+  "version": "1.0.0",
+  "author": {
+    "name": "SiddharthMishraPersonal"
+  },
+  "homepage": "https://github.com/SiddharthMishraPersonal/School-Studies-Skills",
+  "repository": "https://github.com/SiddharthMishraPersonal/School-Studies-Skills",
+  "keywords": ["math", "algebra", "saxon", "education"]
+}
