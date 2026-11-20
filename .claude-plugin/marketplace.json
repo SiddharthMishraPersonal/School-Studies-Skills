@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "A catalog of Claude skills for school studies: practice problem sets, worked solutions and more.",
-    "version": "1.1.0"
+    "version": "1.2.0"
   },
   "plugins": [
     {
       "name": "saxon-algebra-1",
       "source": "./plugins/saxon-algebra-1",
-      "description": "Saxon Algebra 1: builds lesson-focused problem set PDFs and solves screenshots of book pages with step-by-step solution PDFs.",
-      "version": "1.1.0",
+      "description": "Saxon Algebra 1: builds lesson-focused problem set PDFs, grades scanned handwritten answers against their answer key, and solves screenshots of book pages with step-by-step solution PDFs.",
+      "version": "1.2.0",
       "category": "education",
       "keywords": ["math", "algebra", "saxon", "homework", "worksheets"]
     }

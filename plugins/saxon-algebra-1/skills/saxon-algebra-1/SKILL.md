@@ -71,7 +71,8 @@ If no catalog exists yet, start an empty one:
 {
   "catalog_version": 1,
   "problem_sets": [],
-  "solved_pages": []
+  "solved_pages": [],
+  "gradings": []
 }
 ```
 
@@ -87,7 +88,13 @@ Each `problem_sets` entry:
   "solutions": true,
   "delivery": "saved",
   "file": "/full/path/to/Lesson34_Problem_Set_2026-11-19.pdf",
-  "questions": ["Solve for x: 3x + 5 = 20", "..."]
+  "question_pages": "1-2",
+  "solution_pages": "3-4",
+  "questions": ["Solve for x: 3x + 5 = 20", "..."],
+  "answers": [
+    {"n": 1, "answer": "x = 5", "accept": ["5", "x=5"], "simplest_form_required": false},
+    "..."
+  ]
 }
 ```
 
@@ -96,6 +103,18 @@ Each `problem_sets` entry:
 file name). `questions` holds the full text of every question, in order, in
 plain text (exponents may be written `x^2` here). Always store it, even for
 downloads, because it is what keeps future sets unique.
+
+`answers` is the answer key, one entry per question in the same order:
+`answer` is the final answer as it would be printed, `accept` lists other
+correct ways to write it (equivalent forms a student could reasonably write,
+such as `0.5` for `1/2`), and `simplest_form_required` is true when lesson
+N's key rule is about simplifying, so an unsimplified answer is not full
+credit. **Always store the answer key, even when the user chose "questions
+only"**, so the grading skill can score any set. `solution_pages` is null
+when there is no solutions section.
+
+The catalog may also contain a `gradings` list written by the
+`saxon-algebra-1-grader` skill. Leave it as it is.
 
 Each `solved_pages` entry: `lesson` (or null), `created`, `image_sha256`
 (SHA-256 of the screenshot file), `image_file`, `solutions_file`,
@@ -216,9 +235,20 @@ concept.
 
 **Answers:** compute every answer with code (for example Python with sympy
 or fractions) and check it before writing the PDF, even when solutions are
-not printed.
+not printed. Build the answer key (`answers` in the catalog) from these
+checked results.
+
+**Set ID:** give the set its ID before writing the PDF:
+`L<N>-<YYYY-MM-DD>-<NN>`, where NN is `01` for the first set of lesson N
+made today, `02` for the second, and so on (check the catalog). This ID is
+printed on every page and is how the grading skill matches a scanned sheet
+to its answer key.
 
 ## A4: Write the PDF
+
+The sheet will usually be printed, solved by hand, then scanned or
+photographed and graded by the `saxon-algebra-1-grader` skill. Lay it out so
+handwriting is easy to find and read.
 
 - **File name:** `Lesson<N>_Problem_Set_<YYYY-MM-DD>.pdf` with today's date,
   for example `Lesson34_Problem_Set_2026-11-19.pdf` (plus `_01`, `_02`, ...
@@ -226,20 +256,49 @@ not printed.
 - **Location:** as chosen in Shared step 3. For the usual folder, create
   `<base>/Problem Sets YYYY-MM-DD/` (today's date) if needed.
 - Letter size, PDF only. Real superscripts for exponents, not `^`.
+- **Footer on every page** (questions and solutions):
+  `Set <ID> · Page <p> of <total>`, for example
+  `Set L34-2026-11-19-01 · Page 1 of 3`, in plain black text at least 9 pt,
+  centred at the bottom.
 - **Questions section** (always): title "Lesson N Problem Set", the lesson
-  title, a Name / Date / Score ___ / Q line, then a clean numbered list 1 to
-  Q with no answers or hints and room to work under each question.
+  title, a Name / Date / Score ___ / Q line, and one instruction line: "Show
+  your work. Write your final answer on the Answer line." Then the numbered
+  questions 1 to Q, with no answers or hints.
+  - Under each question, blank work space (at least about 1.5 inches, more
+    for multi-step and word problems).
+  - At the bottom of each question's space, a labelled answer line at the
+    right: `Answer: ______________________` (long enough for a fraction or
+    an expression).
+  - Never split a question, its work space or its answer line across two
+    pages.
+- **Scan-friendly layout:** black text on a white background only (no grey
+  shading, coloured boxes or background images), margins of at least 0.75
+  inch on every side, body text at least 12 pt, and nothing printed near the
+  page edges except the footer.
 - **Solutions section** (only if chosen): starts on a new page titled
   "Solutions"; same 1 to Q order, each with the question restated, full
   step-by-step work, and the final answer clearly marked (bold, or prefixed
-  "Answer:").
+  "Answer:"). Keep solutions on their own pages so they can be left out when
+  printing. Record the page ranges in `question_pages` and
+  `solution_pages`.
 
 ## A5: Update the catalog and reply
 
-Add the new set to the catalog (with all its question texts) and save the
-catalog as described in Shared steps 2 and 3. Then tell the user where the
-PDF is (full path, or that it is ready to download), and mention that its
-questions were checked against the N earlier sets for this lesson.
+Add the new set to the catalog (with its ID, all its question texts and the
+answer key) and save the catalog as described in Shared steps 2 and 3. Then
+tell the user:
+
+- where the PDF is (full path, or that it is ready to download) and its set
+  ID;
+- that its questions were checked against the earlier sets for this lesson
+  (say how many);
+- **printing:** if the PDF has solutions, which pages to print for the
+  student (for example "print pages 1-2 only; pages 3-4 are the
+  solutions");
+- **grading:** once the sheet is solved, scan it or take a photo of each
+  page (flat, well lit, all four edges and the footer visible) and ask to
+  grade it. The `saxon-algebra-1-grader` skill will score it against this
+  set's answer key.
 
 ## Several lessons at once
 

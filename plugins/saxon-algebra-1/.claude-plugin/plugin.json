@@ -1,7 +1,7 @@
 {
   "name": "saxon-algebra-1",
-  "description": "Saxon Algebra 1: builds lesson-focused problem set PDFs and solves screenshots of book pages with step-by-step solution PDFs.",
-  "version": "1.1.0",
+  "description": "Saxon Algebra 1: builds lesson-focused problem set PDFs, grades scanned handwritten answers against their answer key, and solves screenshots of book pages with step-by-step solution PDFs.",
+  "version": "1.2.0",
   "author": {
     "name": "SiddharthMishraPersonal"
   },

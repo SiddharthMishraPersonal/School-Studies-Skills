@@ -15,6 +15,7 @@ which understands this format too — see **Option 4** below.
 | Skill | What it does |
 |-------|--------------|
 | [saxon-algebra-1](plugins/saxon-algebra-1/) | Builds lesson-focused Saxon Algebra 1 problem set PDFs, and solves screenshots of book pages with step-by-step solution PDFs. |
+| [saxon-algebra-1-grader](plugins/saxon-algebra-1/) | Grades a printed problem set your student solved by hand: scan or photograph it and get a score and a graded report PDF. Installed with the saxon-algebra-1 plugin. |
 
 ## Install
 
@@ -39,13 +40,15 @@ later:
 ```bash
 git clone https://github.com/SiddharthMishraPersonal/School-Studies-Skills.git
 cp -R School-Studies-Skills/plugins/saxon-algebra-1/skills/saxon-algebra-1 ~/.claude/skills/
+cp -R School-Studies-Skills/plugins/saxon-algebra-1/skills/saxon-algebra-1-grader ~/.claude/skills/
 ```
 
 ### Option 3: Claude app (claude.ai or desktop)
 
-1. Download [`dist/saxon-algebra-1.zip`](dist/saxon-algebra-1.zip) (open the
-   file on GitHub and click **Download raw file**).
-2. In Claude, go to **Settings → Capabilities → Skills** and upload the zip.
+1. Download [`dist/saxon-algebra-1.zip`](dist/saxon-algebra-1.zip) and
+   [`dist/saxon-algebra-1-grader.zip`](dist/saxon-algebra-1-grader.zip) (open
+   each file on GitHub and click **Download raw file**).
+2. In Claude, go to **Settings → Capabilities → Skills** and upload each zip.
 
 ### Option 4: GitHub Copilot
 
