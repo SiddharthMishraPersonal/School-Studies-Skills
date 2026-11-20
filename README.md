@@ -4,6 +4,12 @@ A catalog of [Claude](https://claude.ai) skills for school studies. Each skill i
 packaged as a Claude Code plugin, and this repository is a plugin marketplace,
 so you can install any skill straight from the GitHub link.
 
+Every skill is written in the open [Agent Skills](https://code.claude.com/docs/en/skills)
+`SKILL.md` format (plain Markdown with a YAML frontmatter `name` and
+`description`), so the same files also work with
+[GitHub Copilot](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills),
+which understands this format too — see **Option 4** below.
+
 ## Skills in this catalog
 
 | Skill | What it does |
@@ -41,6 +47,25 @@ cp -R School-Studies-Skills/plugins/saxon-algebra-1/skills/saxon-algebra-1 ~/.cl
    file on GitHub and click **Download raw file**).
 2. In Claude, go to **Settings → Capabilities → Skills** and upload the zip.
 
+### Option 4: GitHub Copilot
+
+Copilot discovers Agent Skills from the same `SKILL.md` folder layout. Clone
+the repo, then copy the skill into one of Copilot's recognized skill folders:
+
+```bash
+git clone https://github.com/SiddharthMishraPersonal/School-Studies-Skills.git
+
+# Personal (available in every project / the Copilot CLI):
+cp -R School-Studies-Skills/plugins/saxon-algebra-1/skills/saxon-algebra-1 ~/.copilot/skills/
+
+# Or project-level (only inside one repo/folder):
+cp -R School-Studies-Skills/plugins/saxon-algebra-1/skills/saxon-algebra-1 .github/skills/
+```
+
+Copilot also reads `.claude/skills/` inside a project, so a project-level
+copy there (as in Option 2, but placed in the project instead of `~/.claude`)
+works for both Claude Code and Copilot at once.
+
 ## Repository layout
 
 ```
@@ -64,3 +89,10 @@ scripts/build-zips.sh                  rebuilds the zips in dist/
 
 When you change an existing skill, bump its `version` in both `plugin.json`
 and `marketplace.json`, and rebuild the zips.
+
+Keep `SKILL.md` itself host-agnostic so it keeps working with Copilot (see
+Option 4 above) as well as Claude: don't name Claude-only tools (e.g.
+`AskUserQuestion`) as a hard requirement — describe the behavior instead
+("ask both questions in one turn") and mention the Claude Code tool only as
+an example. The `.claude-plugin/` manifests and `dist/` zips are purely for
+Claude's install/marketplace flow and aren't read by Copilot.
