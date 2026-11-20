@@ -1,14 +1,14 @@
 ---
-name: saxon-algebra-1
-description: Builds Saxon Algebra 1 problem sets as PDFs focused on one specific lesson's concept, using the user's Saxon_Algebra1_Concept_Guide.pdf (asked for if it cannot be found) to know what each lesson teaches. Before building, confirms where the files should go (a folder on the computer, or download only), asks how many questions to make and whether to include solutions, and checks a catalog of earlier sets so the user can reuse one instead; every new set has questions that never appeared in an earlier set for that lesson. Also solves the questions on a screenshot or photo of an actual Saxon Algebra 1 book page in a step-by-step solutions PDF, marking any answer that is not certain with [Likely]. Use when asked to generate a problem set, practice set, questions, or worksheet for a Saxon Algebra 1 lesson number, or when the user uploads or pastes a screenshot of a Saxon Algebra 1 page to be solved.
+name: problem-set-builder
+description: Builds lesson-focused problem sets as PDFs, using the user's Concept_Guide.pdf (asked for if it cannot be found) to know what each lesson teaches. Before building, confirms where the files should go (a folder on the computer, or download only), asks how many questions to make and whether to include solutions, and checks a catalog of earlier sets so the user can reuse one instead; every new set has questions that never appeared in an earlier set for that lesson. Also solves the questions on a screenshot or photo of an actual textbook page in a step-by-step solutions PDF, marking any answer that is not certain with [Likely]. Use when asked to generate a problem set, practice set, questions, or worksheet for a numbered lesson in a textbook or course, or when the user uploads or pastes a screenshot of a textbook page to be solved.
 ---
 
 This skill has two modes:
 
 - **Mode A: Generate a problem set** for a lesson number.
 - **Mode B: Solve a book page screenshot** when the user uploads or pastes a
-  screenshot/photo of a Saxon Algebra 1 book page. Go to "Mode B" near the
-  end of this file after doing the two shared steps below.
+  screenshot/photo of a textbook page. Go to "Mode B" near the end of this
+  file after doing the two shared steps below.
 
 Both modes always start with **Shared step 1 (concept guide)** and
 **Shared step 2 (catalog)**, and always confirm the output location
@@ -22,26 +22,31 @@ already answered in their request.
 
 # Shared step 1: Get the concept guide (always, before anything else)
 
-The concept guide `Saxon_Algebra1_Concept_Guide.pdf` lists each lesson's
-number, title, key rule and example. It is how this skill knows what a
-lesson teaches. **Never generate or solve anything without reading it
-first, and never invent a lesson's content from memory.**
+The concept guide `Concept_Guide.pdf` lists each lesson's number, title, key
+rule and example. It is how this skill knows what a lesson teaches. **Never
+generate or solve anything without reading it first, and never invent a
+lesson's content from memory.**
 
 Find it in this order and stop at the first match:
 
 1. A copy the user attached or uploaded in this conversation.
-2. A file of that name in the current working directory, or in a
-   `Saxon Algebra 1` folder inside it.
+2. A file of that name in the current working directory, or in any
+   immediate subfolder of it.
 3. A search of the user's home folder (up to about 4 levels deep, skipping
-   hidden and system folders such as `Library`) for
-   `Saxon_Algebra1_Concept_Guide.pdf`.
+   hidden and system folders such as `Library`) for `Concept_Guide.pdf`.
 
 Then:
 
 - **Found exactly one:** tell the user in one line which guide you are using
   (its full path, or "the guide you uploaded") and continue. If they say it
   is the wrong one, ask for the right one.
-- **Found more than one:** ask which one to use.
+- **Found more than one** (for example, separate folders for different
+  subjects): skim each candidate's title/subject (its folder name, or the
+  course title on the guide's first page) and if the user's request already
+  names a subject or course (for example "chemistry" or "algebra 2") and
+  exactly one candidate clearly matches, use that one and tell the user
+  which, as in "found exactly one". Otherwise list the candidates by subject
+  or folder name (not bare file paths) and ask which to use.
 - **Found none** (or, in the Claude app, the folder is not shared with the
   session): stop and ask the user to upload the guide or give its path (or
   give access to the folder that has it). Explain briefly that the guide is
@@ -51,13 +56,14 @@ Then:
 Read the guide and find the target lesson. If lesson N is not in the guide,
 tell the user and stop.
 
-The **base folder** is the folder that contains the guide on disk (normally
-named `Saxon Algebra 1`). If the guide was only uploaded into the chat,
-there is no base folder.
+The **base folder** is the folder that contains the guide on disk. It can be
+named anything (for example a subject or course name, such as `Algebra 1` or
+`AP Chemistry`) — there is no fixed folder name to look for. If the guide was
+only uploaded into the chat, there is no base folder.
 
 # Shared step 2: Read the catalog
 
-The catalog is a JSON file, `Saxon_Algebra1_Catalog.json`, that records
+The catalog is a JSON file, `Problem_Set_Catalog.json`, that records
 everything this skill has generated. It lets the skill offer earlier files
 for reuse and keep new questions unique.
 
@@ -114,7 +120,7 @@ only"**, so the grading skill can score any set. `solution_pages` is null
 when there is no solutions section.
 
 The catalog may also contain a `gradings` list written by the
-`saxon-algebra-1-grader` skill. Leave it as it is.
+`problem-set-grader` skill. Leave it as it is.
 
 Each `solved_pages` entry: `lesson` (or null), `created`, `image_sha256`
 (SHA-256 of the screenshot file), `image_file`, `solutions_file`,
@@ -150,8 +156,8 @@ screenshot anywhere on the user's computer.
 
 **The catalog in download mode:** the catalog is a small text file, not an
 output, so keep updating it in the base folder if there is one. If there is
-no base folder, also hand over the updated `Saxon_Algebra1_Catalog.json` as
-a download and tell the user to upload it next time so the skill can avoid
+no base folder, also hand over the updated `Problem_Set_Catalog.json` as a
+download and tell the user to upload it next time so the skill can avoid
 repeating questions and offer earlier sets.
 
 **Files never overwrite** in any folder: if a name is taken, add the next
@@ -247,7 +253,7 @@ to its answer key.
 ## A4: Write the PDF
 
 The sheet will usually be printed, solved by hand, then scanned or
-photographed and graded by the `saxon-algebra-1-grader` skill. Lay it out so
+photographed and graded by the `problem-set-grader` skill. Lay it out so
 handwriting is easy to find and read.
 
 - **File name:** `Lesson<N>_Problem_Set_<YYYY-MM-DD>.pdf` with today's date,
@@ -297,8 +303,8 @@ tell the user:
   solutions");
 - **grading:** once the sheet is solved, scan it or take a photo of each
   page (flat, well lit, all four edges and the footer visible) and ask to
-  grade it. The `saxon-algebra-1-grader` skill will score it against this
-  set's answer key.
+  grade it. The `problem-set-grader` skill will score it against this set's
+  answer key.
 
 ## Several lessons at once
 
@@ -307,13 +313,12 @@ user asks for different settings per lesson. Do the A1 check for each
 lesson (list all earlier sets in one question). Save one PDF and one catalog
 entry per lesson.
 
-# Mode B: Solve a Saxon Algebra 1 book page screenshot
+# Mode B: Solve a textbook page screenshot
 
 Use this mode whenever the user uploads, pastes or points to an image
-(screenshot or photo) of an actual Saxon Algebra 1 lesson page. Do Shared
-steps 1 and 2 first. Do not ask how many questions or whether to include
-solutions: solve every question on the page and always include step-by-step
-solutions.
+(screenshot or photo) of an actual textbook lesson page. Do Shared steps 1
+and 2 first. Do not ask how many questions or whether to include solutions:
+solve every question on the page and always include step-by-step solutions.
 
 ## B1: Find the image and check the catalog
 
@@ -335,7 +340,7 @@ solutions.
   folder: that folder. In download mode: do not save the screenshot.
 - **File name:** `Lesson<N>_Page_<YYYY-MM-DD>.<ext>`, keeping the original
   extension, where N is the lesson number printed on the page. If the page
-  shows a range of lessons or none, use `Saxon_Page_<YYYY-MM-DD>.<ext>`.
+  shows a range of lessons or none, use `Lesson_Page_<YYYY-MM-DD>.<ext>`.
   Save each page if several are uploaded.
 - If no file of the image can be found on disk, still solve the page, then
   tell the user the screenshot could not be saved automatically and ask them
@@ -352,16 +357,17 @@ solutions.
 - If part of the page is cut off, blurry or hidden, solve what is readable,
   and list the unreadable questions in the PDF and in your reply as "could
   not read" rather than guessing silently.
-- Use the concept guide to identify the lesson's concept and to solve the
-  way Saxon teaches it (its methods and vocabulary).
+- Use the concept guide to identify the lesson's concept and to solve it the
+  way the concept guide teaches it (its methods and vocabulary).
 
 ## B4: Solve
 
 - Give **full step-by-step work** for every question, then the **final
   answer** clearly marked (bold and prefixed "Answer:").
 - Check every numerical/algebraic answer with code (for example Python with
-  sympy or fractions) before writing the PDF. Simplify answers the way Saxon
-  expects (reduced fractions, like terms combined, units on word problems).
+  sympy or fractions) before writing the PDF. Simplify answers the way the
+  concept guide expects (reduced fractions, like terms combined, units on
+  word problems).
 - For multiple-choice questions, show the work and name the chosen letter.
 - **Confidence marking:** if you are not 100% sure a solution is correct
   (the question was hard to read, the wording is ambiguous, a figure was
@@ -375,7 +381,7 @@ solutions.
 - **Location:** as chosen in Shared step 3 (usual folder:
   `<base>/adhoc-solutions/`, created if missing).
 - **File name:** `Lesson<N>_Solutions_<YYYY-MM-DD>.pdf` (or
-  `Saxon_Page_Solutions_<YYYY-MM-DD>.pdf` if no lesson number), with `_01`,
+  `Lesson_Page_Solutions_<YYYY-MM-DD>.pdf` if no lesson number), with `_01`,
   `_02`, ... instead of overwriting. Several screenshots of the same lesson
   uploaded together go in one PDF.
 - **Layout (letter size):** title "Lesson N Solutions", the lesson title,
