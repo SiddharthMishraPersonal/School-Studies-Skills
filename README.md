@@ -4,11 +4,13 @@ A catalog of [Claude](https://claude.ai) skills for school studies. Each skill i
 packaged as a Claude Code plugin, and this repository is a plugin marketplace,
 so you can install any skill straight from the GitHub link.
 
-Every skill is written in the open [Agent Skills](https://code.claude.com/docs/en/skills)
+Every skill is written in the open [Agent Skills](https://agentskills.io)
 `SKILL.md` format (plain Markdown with a YAML frontmatter `name` and
-`description`), so the same files also work with
+`description`), the same standard now used by
 [GitHub Copilot](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills),
-which understands this format too — see **Option 4** below.
+[ChatGPT](https://help.openai.com/en/articles/20001066-skills-in-chatgpt) and
+[OpenAI Codex](https://developers.openai.com/codex/build-skills) — so the
+same files work across all of them. See **Options 4–5** below.
 
 > **Disclaimer:** This project is not affiliated with, endorsed by, or
 > sponsored by any textbook publisher. No textbook content or other
@@ -76,6 +78,39 @@ cp -R School-Studies-Skills/plugins/study-problem-sets/skills/problem-set-builde
 Copilot also reads `.claude/skills/` inside a project, so a project-level
 copy there (as in Option 2, but placed in the project instead of `~/.claude`)
 works for both Claude Code and Copilot at once.
+
+### Option 5: ChatGPT and OpenAI Codex
+
+**ChatGPT** (Business, Enterprise, Healthcare and Edu plans) has a native
+Skills feature:
+
+1. Download [`dist/problem-set-builder.zip`](dist/problem-set-builder.zip)
+   and [`dist/problem-set-grader.zip`](dist/problem-set-grader.zip) — the
+   same zips used for the Claude app in Option 3.
+2. In ChatGPT, open **Plugins → Skills → Create → Upload from your
+   computer** and upload each zip.
+
+On **Free, Go, Plus or Pro**, there's no Skills menu, so instead create a
+**Project**, open its **Project settings**, and paste the skill's
+`SKILL.md` content into the project instructions. It won't run supporting
+scripts, but the instructions themselves still work.
+
+**OpenAI Codex** (CLI / IDE) discovers Agent Skills from folders the same
+way Copilot does:
+
+```bash
+git clone https://github.com/SiddharthMishraPersonal/School-Studies-Skills.git
+
+# Personal (every project):
+cp -R School-Studies-Skills/plugins/study-problem-sets/skills/problem-set-builder ~/.agents/skills/
+cp -R School-Studies-Skills/plugins/study-problem-sets/skills/problem-set-grader ~/.agents/skills/
+
+# Or project-level (only inside one repo/folder):
+cp -R School-Studies-Skills/plugins/study-problem-sets/skills/problem-set-builder .agents/skills/
+```
+
+`.agents/skills/` is the shared convention Codex and Copilot both read, so
+one copy there covers both.
 
 ## How to use
 
@@ -183,7 +218,7 @@ the [plugin README](plugins/study-problem-sets/README.md).
 plugins/<plugin>/.claude-plugin/plugin.json
 plugins/<plugin>/skills/<skill>/SKILL.md
 plugins/<plugin>/README.md             setup and usage for that skill
-dist/<skill>.zip                       upload-ready zips for the Claude app
+dist/<skill>.zip                       upload-ready zips for the Claude app and ChatGPT Business/Enterprise
 scripts/build-zips.sh                  rebuilds the zips in dist/
 ```
 
@@ -200,12 +235,15 @@ scripts/build-zips.sh                  rebuilds the zips in dist/
 When you change an existing skill, bump its `version` in both `plugin.json`
 and `marketplace.json`, and rebuild the zips.
 
-Keep `SKILL.md` itself host-agnostic so it keeps working with Copilot (see
-Option 4 above) as well as Claude: don't name Claude-only tools (e.g.
-`AskUserQuestion`) as a hard requirement — describe the behavior instead
-("ask both questions in one turn") and mention the Claude Code tool only as
-an example. The `.claude-plugin/` manifests and `dist/` zips are purely for
-Claude's install/marketplace flow and aren't read by Copilot.
+Keep `SKILL.md` itself host-agnostic so it keeps working with Copilot,
+ChatGPT and Codex (see Options 4–5 above) as well as Claude: don't name
+Claude-only tools (e.g. `AskUserQuestion`) or paths (e.g.
+`~/.claude/image-cache/`) as a hard requirement — describe the behavior
+instead ("ask both questions in one turn") and mention the Claude Code
+mechanism only as an example. The `.claude-plugin/` manifests are purely for
+Claude's plugin-marketplace flow; the `dist/` zips are read by both the
+Claude app and ChatGPT's Skills upload. None of this is read by Copilot or
+Codex, which discover `SKILL.md` straight from the repo folders instead.
 
 Also keep skill content generic rather than naming a specific publisher or
 textbook brand (see the disclaimer above) — name the file/folder
