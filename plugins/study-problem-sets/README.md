@@ -1,10 +1,11 @@
 # study-problem-sets
 
-A Claude skill for any numbered-lesson textbook or course — also compatible
-with GitHub Copilot's Agent Skills (see the main
-[repo README](../../README.md#option-4-github-copilot) for how to install it
-there). It includes two skills, `problem-set-builder` and
-`problem-set-grader`, which together do three things:
+A Claude skill for any numbered-lesson textbook or course — written in the
+open Agent Skills format, so it's also compatible with GitHub Copilot,
+ChatGPT and OpenAI Codex (see the main
+[repo README](../../README.md#install) for how to install it on each). It
+includes two skills, `problem-set-builder` and `problem-set-grader`, which
+together do three things:
 
 1. **Problem sets:** ask for a problem set for a lesson number, and it builds
    a PDF of practice questions on that lesson's concept, easiest to hardest,
