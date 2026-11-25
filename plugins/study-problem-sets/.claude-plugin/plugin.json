@@ -1,11 +1,11 @@
 {
   "name": "study-problem-sets",
-  "description": "Builds lesson-focused problem set PDFs from your own concept guide, grades scanned handwritten answers against their answer key, and solves screenshots of textbook pages with step-by-step solution PDFs. Works with any numbered-lesson textbook or course, not tied to a specific publisher.",
-  "version": "2.0.0",
+  "description": "Builds lesson-focused problem set PDFs from your own concept guide file(s), grades scanned handwritten answers against their answer key, solves screenshots of textbook pages with step-by-step solution PDFs, and builds SAT-style math practice sets scoped to any lesson range. Supports multiple concept guide files per folder (combined, with alias citations), and always asks before saving, with a ZIP-of-everything option. Works with any numbered-lesson textbook or course, not tied to a specific publisher or test organization.",
+  "version": "4.0.0",
   "author": {
     "name": "SiddharthMishraPersonal"
   },
   "homepage": "https://github.com/SiddharthMishraPersonal/School-Studies-Skills",
   "repository": "https://github.com/SiddharthMishraPersonal/School-Studies-Skills",
-  "keywords": ["math", "education", "homework", "worksheets", "study"]
+  "keywords": ["math", "education", "homework", "worksheets", "study", "sat", "test-prep"]
 }

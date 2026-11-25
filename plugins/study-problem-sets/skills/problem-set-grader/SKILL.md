@@ -32,14 +32,19 @@ already answered in their request, or answered earlier in this conversation.
 # Step 2: Find the answer key
 
 1. **Find the catalog(s)** `Problem_Set_Catalog.json`: one the user uploaded
-   in the chat, or any found in a folder that also contains
-   `Concept_Guide.pdf`. Search for these the same way as the concept guide:
-   the current working directory, any immediate subfolder of it (there may
-   be one per subject, e.g. `Math/`, `Chemistry/`, `Physics/`), then the
-   user's home folder (about 4 levels deep, skipping hidden and system
-   folders such as `Library`). Each catalog's folder is a **base folder**;
-   if there is more than one, keep all of them as candidates rather than
-   picking one up front.
+   in the chat, or any found in a folder that also contains at least one
+   concept file — a file matching `<suffix>_Concept.pdf`,
+   `<suffix>_Concept.docx`, or `<suffix>_Concept.doc` (the strict pattern
+   `problem-set-builder` uses; the suffix is that guide's alias). **Do not
+   assume a folder** if none is found this way — ask the user to attach the
+   catalog or problem set PDF, or point to the folder. Search the same way
+   as `problem-set-builder` does for concept files: the current working
+   directory, any immediate subfolder of it (there may be one per subject,
+   e.g. `Math/`, `Chemistry/`, `Physics/`), then the user's home folder
+   (about 4 levels deep, skipping hidden and system folders such as
+   `Library`). Each catalog's folder is a **base folder**; if there is more
+   than one, keep all of them as candidates rather than picking one up
+   front.
 2. **Read the set ID** from the footer of the scanned pages
    (`Set L34-2026-11-19-01 · Page 1 of 3`) and look it up in every candidate
    catalog (the ID is unique within one catalog, but two different subjects
@@ -65,9 +70,11 @@ already answered in their request, or answered earlier in this conversation.
    agrees, read the questions from the scan itself, solve them with code,
    and grade against that, noting it in the report.
 
-Also read the concept guide entry for the lesson if it is available, to know
-whether the lesson requires answers in simplest form and to word the mistake
-notes the way the concept guide teaches it.
+Also read the relevant concept guide's entry for the lesson if it is
+available — use the set's `lesson_refs`/`concept_guides` to find which
+guide and alias it came from when more than one is active — to know whether
+the lesson requires answers in simplest form and to word the mistake notes
+the way that guide teaches it.
 
 # Step 3: Ask before grading
 
@@ -79,23 +86,33 @@ In one turn, ask:
    - "Final answer plus work": also look at the work shown and give half
      credit when the method is right but there is a small slip (for example
      an arithmetic error in the last step).
-2. **Where should the report go?**
+2. **Where should the report go?** Always ask — never assume a save
+   location, including never silently using a generic "outputs" area your
+   environment offers by default.
    - the usual folder, shown with its full path:
      `<base>/Graded YYYY-MM-DD/` (only when there is a base folder);
    - another folder on the computer (the user gives the path);
-   - "Don't save to my computer; give me a download".
+   - "a ZIP file with the report, the scan copy, and the catalog".
 
 Do not ask about the set if Step 2 found it with certainty; just say which
 set you are grading (ID, lesson and title).
 
-**Download mode:** produce the report through whatever download mechanism
-the environment has (for example, in the Claude app, write it to the outputs
-folder). If the environment has no way to hand over a download (for example
-Claude Code in a terminal), say so and offer a temporary folder or a folder
-of their choice. In download mode, write nothing to the user's computer
-except the catalog update in the base folder (if there is one). If there is
-no base folder, hand over the updated catalog as a download too and remind
-the user to upload it next time.
+**If the user doesn't give a real folder** (they pick the zip option, or
+don't answer with a folder when asked), **default to the ZIP option** and
+say so plainly, with this caveat: *since nothing is saved anywhere
+readable later, this grading won't show up in future progress comparisons
+for this lesson unless you give a real folder next time, or re-upload this
+ZIP's catalog file.* If the user says they want grading history tracked,
+ask them for a real folder instead.
+
+**ZIP mode:** produce the report PDF, the scan copy, and the updated
+catalog as files, package them into one `.zip` (for example
+`Lesson34_Graded_2026-11-21.zip`), and hand it over through whatever
+download mechanism the environment has (for example, in the Claude app,
+write it to the outputs folder so it appears as a downloadable file in the
+chat). If the environment has no way to hand over a download at all, say so
+and offer a temporary folder instead. Write nothing else to the user's
+computer in ZIP mode.
 
 **Files never overwrite:** if a name is taken, add `_01`, `_02`, ... before
 the extension.
@@ -148,10 +165,11 @@ nearest whole number.
 
 - **File name:** `Lesson<N>_Graded_<YYYY-MM-DD>.pdf` (today's date), plus
   `_01`, `_02`, ... if taken.
-- **Location:** as chosen in Step 3. For the usual folder, create
-  `<base>/Graded YYYY-MM-DD/` if needed and also copy the scan file(s) there
-  as `Lesson<N>_Scan_<YYYY-MM-DD>.<ext>` (`_p1`, `_p2`, ... for separate page
-  images). In download mode, do not copy the scans anywhere.
+- **Location:** as chosen in Step 3. For the usual folder (or another
+  folder), create `<base>/Graded YYYY-MM-DD/` if needed and also copy the
+  scan file(s) there as `Lesson<N>_Scan_<YYYY-MM-DD>.<ext>` (`_p1`, `_p2`,
+  ... for separate page images). In ZIP mode, include the scan copy inside
+  the zip instead of saving it separately.
 - **Layout (letter size, black on white):**
   - Title "Lesson N Graded", the lesson title, the set ID, the date graded,
     the grading style, and the scan file name(s).
@@ -191,6 +209,9 @@ missing) and save the catalog:
 }
 ```
 
+`delivery` is `"saved"` (a real folder) or `"zip"` (bundled into a download
+with the catalog; file paths are then just names inside the zip).
+
 If the same set was graded before, keep the old entry and add the new one
 (for example after a regrade or a second attempt).
 
@@ -200,7 +221,8 @@ Then tell the user:
 - the questions that were wrong or blank, each with the correct answer;
 - every [Check] question, with what you read and the other possible
   reading, and how the score would change;
-- where the report is (full path, or that it is ready to download);
+- where the report is (full path, or that it is ready to download inside
+  the zip);
 - if earlier gradings exist for the same lesson, one line comparing them
   (for example "Lesson 34: 9/15 on Nov 12, 13/15 today").
 
