@@ -4,8 +4,8 @@ A Claude skill for any numbered-lesson textbook or course — written in the
 open Agent Skills format, so it's also compatible with GitHub Copilot,
 ChatGPT and OpenAI Codex (see the main
 [repo README](../../README.md#install) for how to install it on each). It
-includes two skills, `problem-set-builder` and `problem-set-grader`, which
-together do three things:
+includes three skills — `problem-set-builder`, `problem-set-grader`, and
+`sat-practice-builder` — which together do four things:
 
 1. **Problem sets:** ask for a problem set for a lesson number, and it builds
    a PDF of practice questions on that lesson's concept, easiest to hardest,
@@ -18,6 +18,10 @@ together do three things:
    by hand, then scan it or photograph each page. Claude reads the
    handwritten answers, scores them against that set's answer key, and makes
    a graded report PDF.
+4. **SAT-style practice:** builds a practice set in real digital-SAT-Math
+   format (multiple choice plus grid-in, a reference-formula box,
+   easy/medium/hard tags) covering one lesson, a lesson range, or the whole
+   course — see "Build SAT-style practice" below.
 
 It is not tied to any specific textbook, publisher, or subject — it works
 from a concept guide you provide yourself (see below), so it works just as
@@ -41,6 +45,7 @@ Algebra 1/                          (or any name you like)
 ├── Problem_Set_Catalog.json        record of everything generated
 ├── Problem Sets YYYY-MM-DD/        created by the skill
 ├── Graded YYYY-MM-DD/              graded reports and scan copies
+├── SAT Practice YYYY-MM-DD/        SAT-style practice sets
 ├── media/                          screenshots you uploaded
 └── adhoc-solutions/                solutions for those screenshots
 ```
@@ -117,6 +122,48 @@ something, say so (for example "question 4 says 7") and it regrades.
 Every grading is saved in the catalog, so Claude can show progress on a
 lesson over time.
 
+## Build SAT-style practice
+
+Not affiliated with the College Board — "SAT" describes the practice
+format, not an official or licensed product. Say, for example:
+
+- "Make SAT-level practice questions" — defaults to the **whole course**
+  (every lesson in your concept guide) and **22 questions** (one real
+  digital SAT Math module's length), **mixed** easy/medium/hard.
+- "SAT questions through lesson 49" — lessons 1–49, spread across the range,
+  not just lesson 49.
+- "SAT practice for only lesson 12" — scoped to that one lesson.
+
+In Claude Code, typing `/sat-practice-builder` suggests the arguments it
+takes (lesson, difficulty, count) as you type; anywhere else, just say what
+you want in plain language and Claude asks for anything missing.
+
+Each question shows:
+- the lesson(s) its concept comes from, under the question number (same
+  style as `problem-set-builder`'s lesson references);
+- an *(Easy)*, *(Medium)*, or *(Hard)* tag right after the question, in
+  italics, smaller than body text;
+- for multiple choice (most questions): four lettered choices, where every
+  wrong one is built from a real, specific mistake (a sign error, the wrong
+  formula, stopping one step early) rather than a random number;
+- for the rest (a grid-in minority, like the real test): just a labelled
+  answer box, no choices — only used when the answer is a plain positive
+  number or simple fraction, since the real grid-in format can't take a
+  negative sign or a variable.
+
+A reference box of standard geometry facts (circle/triangle/rectangle area,
+Pythagorean theorem, special right triangles, volumes) is printed once near
+the top, the way the real test's math section opens.
+
+**Repeats are allowed here, on purpose** (unlike `problem-set-builder`,
+which never repeats): about 15% of a new set may be reinforcement questions
+pulled from your earlier SAT sets for the same or a wider scope, so your
+student sees a few familiar problems again. The rest are always freshly
+written and checked against everything generated before. Claude tells you
+how many were new versus reused each time. If solutions are included, every
+wrong multiple-choice answer gets a one-line note on the mistake it
+represents, not just the right answer.
+
 ## Output files
 
 | What | Where | Name |
@@ -126,6 +173,7 @@ lesson over time.
 | Screenshot solutions | `adhoc-solutions/` | `Lesson<N>_Solutions_<YYYY-MM-DD>.pdf` |
 | Graded report | `Graded YYYY-MM-DD/` | `Lesson<N>_Graded_<YYYY-MM-DD>.pdf` |
 | Scan copy | `Graded YYYY-MM-DD/` | `Lesson<N>_Scan_<YYYY-MM-DD>.<ext>` |
+| SAT practice set | `SAT Practice YYYY-MM-DD/` | `SAT_Practice_<scope>_<YYYY-MM-DD>.pdf` |
 
 These are the usual locations; you can pick another folder or a download
 instead. Files are never overwritten; a repeat gets `_01`, `_02`, and so on.

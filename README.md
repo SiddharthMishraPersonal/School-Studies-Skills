@@ -13,7 +13,9 @@ Every skill is written in the open [Agent Skills](https://agentskills.io)
 same files work across all of them. See **Options 4–5** below.
 
 > **Disclaimer:** This project is not affiliated with, endorsed by, or
-> sponsored by any textbook publisher. No textbook content or other
+> sponsored by any textbook publisher or test organization (including the
+> College Board — "SAT" is its trademark, referenced here only to describe
+> a practice format). No textbook content, real test questions, or other
 > copyrighted material is included in this repository — you supply your own
 > `Concept_Guide.pdf` for whatever course you're using. Generated problems,
 > solutions, and grading are produced by an AI model and may contain errors;
@@ -26,6 +28,7 @@ same files work across all of them. See **Options 4–5** below.
 |-------|--------------|
 | [problem-set-builder](plugins/study-problem-sets/) | Builds lesson-focused problem set PDFs from your own concept guide, and solves screenshots of textbook pages with step-by-step solution PDFs. Works with any numbered-lesson textbook or course. |
 | [problem-set-grader](plugins/study-problem-sets/) | Grades a printed problem set your student solved by hand: scan or photograph it and get a score and a graded report PDF. Installed with the study-problem-sets plugin. |
+| [sat-practice-builder](plugins/study-problem-sets/) | Builds SAT-style math practice sets covering one lesson, a lesson range, or the whole course — real SAT item format, easy/medium/hard tagging, and meaningful wrong-answer choices. Installed with the study-problem-sets plugin. |
 
 ## Install
 
@@ -51,6 +54,7 @@ later:
 git clone https://github.com/SiddharthMishraPersonal/School-Studies-Skills.git
 cp -R School-Studies-Skills/plugins/study-problem-sets/skills/problem-set-builder ~/.claude/skills/
 cp -R School-Studies-Skills/plugins/study-problem-sets/skills/problem-set-grader ~/.claude/skills/
+cp -R School-Studies-Skills/plugins/study-problem-sets/skills/sat-practice-builder ~/.claude/skills/
 ```
 
 ### Option 3: Claude app (claude.ai or desktop)
@@ -59,6 +63,13 @@ cp -R School-Studies-Skills/plugins/study-problem-sets/skills/problem-set-grader
    [`dist/problem-set-grader.zip`](dist/problem-set-grader.zip) (open
    each file on GitHub and click **Download raw file**).
 2. In Claude, go to **Settings → Capabilities → Skills** and upload each zip.
+
+`sat-practice-builder` isn't included here: it uses an `argument-hint` field
+(for its Claude Code `/sat-practice-builder` autocomplete) that's outside
+the strict six-field Agent Skills spec claude.ai's upload validator
+enforces, so its zip would be rejected. It works on Claude Code (Option 2)
+and in ordinary claude.ai/desktop conversation if you just paste its
+`SKILL.md` content into the chat instead of uploading it as a Skill.
 
 ### Option 4: GitHub Copilot
 
@@ -77,7 +88,12 @@ cp -R School-Studies-Skills/plugins/study-problem-sets/skills/problem-set-builde
 
 Copilot also reads `.claude/skills/` inside a project, so a project-level
 copy there (as in Option 2, but placed in the project instead of `~/.claude`)
-works for both Claude Code and Copilot at once.
+works for both Claude Code and Copilot at once. `sat-practice-builder`
+copies the same way; its extra `argument-hint` line is a Claude Code
+extension, not part of Copilot's documented fields — folder-based readers
+generally just ignore frontmatter keys they don't recognize (only claude.ai's
+dedicated upload validator is confirmed to hard-error on this), but if
+Copilot ever complains, delete that one line.
 
 ### Option 5: ChatGPT and OpenAI Codex
 
@@ -86,14 +102,17 @@ Skills feature:
 
 1. Download [`dist/problem-set-builder.zip`](dist/problem-set-builder.zip)
    and [`dist/problem-set-grader.zip`](dist/problem-set-grader.zip) — the
-   same zips used for the Claude app in Option 3.
+   same zips used for the Claude app in Option 3. (`sat-practice-builder`'s
+   zip isn't upload-ready for the same `argument-hint` reason as Option 3 —
+   paste its `SKILL.md` into a Project instead, below.)
 2. In ChatGPT, open **Plugins → Skills → Create → Upload from your
    computer** and upload each zip.
 
 On **Free, Go, Plus or Pro**, there's no Skills menu, so instead create a
 **Project**, open its **Project settings**, and paste the skill's
 `SKILL.md` content into the project instructions. It won't run supporting
-scripts, but the instructions themselves still work.
+scripts, but the instructions themselves still work. This is also the route
+for `sat-practice-builder` on any ChatGPT plan.
 
 **OpenAI Codex** (CLI / IDE) discovers Agent Skills from folders the same
 way Copilot does:
@@ -104,6 +123,7 @@ git clone https://github.com/SiddharthMishraPersonal/School-Studies-Skills.git
 # Personal (every project):
 cp -R School-Studies-Skills/plugins/study-problem-sets/skills/problem-set-builder ~/.agents/skills/
 cp -R School-Studies-Skills/plugins/study-problem-sets/skills/problem-set-grader ~/.agents/skills/
+cp -R School-Studies-Skills/plugins/study-problem-sets/skills/sat-practice-builder ~/.agents/skills/
 
 # Or project-level (only inside one repo/folder):
 cp -R School-Studies-Skills/plugins/study-problem-sets/skills/problem-set-builder .agents/skills/
@@ -208,6 +228,26 @@ any answer it isn't fully sure of as **[Likely]**.
 Unclear handwriting is marked **[Check]** with both possible readings rather
 than guessed at.
 
+### Build SAT-style practice
+
+Say, for example:
+
+- "Make SAT-level practice questions" — defaults to the whole course and 22
+  questions (one real digital SAT Math module's length), mixed easy/medium/hard.
+- "SAT questions through lesson 49" — covers lessons 1–49, not just lesson 49.
+- "SAT practice for just lesson 12 only" — scoped to that one lesson.
+
+Each question shows the lesson(s) it's drawn from under its number (like
+`problem-set-builder`) and an *(Easy/Medium/Hard)* tag after the question.
+Most questions are multiple choice with four real-SAT-style answer choices
+— each wrong one built from an actual common mistake, not a random number —
+plus a smaller share of grid-in (no-choices) questions, matching the real
+test's mix. Unlike the other two skills, a small share (about 15%) of
+questions may be deliberate repeats from earlier sets for reinforcement;
+Claude tells you how many were new versus reused. In Claude Code, typing
+`/sat-practice-builder` suggests the arguments it takes (lesson, difficulty,
+count) as you type.
+
 Full details, including the catalog format and output file names, are in
 the [plugin README](plugins/study-problem-sets/README.md).
 
@@ -245,8 +285,17 @@ Claude's plugin-marketplace flow; the `dist/` zips are read by both the
 Claude app and ChatGPT's Skills upload. None of this is read by Copilot or
 Codex, which discover `SKILL.md` straight from the repo folders instead.
 
-Also keep skill content generic rather than naming a specific publisher or
-textbook brand (see the disclaimer above) — name the file/folder
-conventions the skill expects instead (for example `Concept_Guide.pdf`), so
-the skill works for any course with that shape and carries no trademark
-exposure.
+Also keep skill content generic rather than naming a specific publisher,
+textbook brand, or test organization (see the disclaimer above) — name the
+file/folder conventions the skill expects instead (for example
+`Concept_Guide.pdf`), so the skill works for any course with that shape and
+carries no trademark exposure.
+
+Adding frontmatter fields beyond `name` and `description` (for example
+`argument-hint`, as `sat-practice-builder` does for its Claude Code
+slash-command autocomplete) is fine when a host-specific feature is worth
+it, but it opts that skill out of claude.ai's/ChatGPT's strict zip-upload
+path — only `name`, `description`, `license`, `compatibility`, `metadata`
+and `allowed-tools` are allowed there. Note the tradeoff in the Install
+section (see Option 3/5's notes on `sat-practice-builder`) rather than
+silently shipping a zip that will fail to upload.
