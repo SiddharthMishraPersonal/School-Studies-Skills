@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "A catalog of Claude skills for school studies: practice problem sets, worked solutions, SAT-style practice and more.",
-    "version": "3.0.0"
+    "version": "4.0.0"
   },
   "plugins": [
     {
       "name": "study-problem-sets",
       "source": "./plugins/study-problem-sets",
-      "description": "Builds lesson-focused problem set PDFs from your own concept guide, grades scanned handwritten answers against their answer key, solves screenshots of textbook pages with step-by-step solution PDFs, and builds SAT-style math practice sets scoped to any lesson range. Works with any numbered-lesson textbook or course.",
-      "version": "3.0.0",
+      "description": "Builds lesson-focused problem set PDFs from your own concept guide file(s), grades scanned handwritten answers against their answer key, solves screenshots of textbook pages with step-by-step solution PDFs, and builds SAT-style math practice sets scoped to any lesson range. Supports multiple concept guide files per folder (combined, with alias citations), and always asks before saving, with a ZIP-of-everything option.",
+      "version": "4.0.0",
       "category": "education",
       "keywords": ["math", "education", "homework", "worksheets", "study", "sat", "test-prep"]
     }

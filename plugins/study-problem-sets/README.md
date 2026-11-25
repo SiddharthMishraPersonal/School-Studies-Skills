@@ -32,16 +32,28 @@ lessons.
 
 The skill works inside a folder you create yourself, named whatever you
 like (for example `Algebra 1`, `AP Chemistry`, or just `Study`). It must
-contain a file named `Concept_Guide.pdf` listing each lesson's number,
-title, key rule and an example. The skill uses it to know what each lesson
-teaches. This guide is **not** included in this repository; make your own
-for the course you're studying. If Claude cannot find the guide, it asks you
-to upload it or tell it where it is. It never makes up a lesson's content
-without the guide.
+contain at least one **concept guide file** — named
+`<anything>_Concept.pdf` or `<anything>_Concept.docx` (Word also works).
+The `_Concept` part and the PDF/Word file type are required; the part
+before it is up to you and becomes that guide's short name (its **alias**).
+Each guide lists its lessons' numbers, titles, key rules and examples. This
+is **not** included in this repository; make your own for the course you're
+studying. If Claude can't find a matching file anywhere, it will not guess
+— it asks you to either attach one or tell it which folder your concept
+files are in. It never makes up a lesson's content without a guide.
+
+**More than one concept file in the same folder is supported and
+combined** — for example a course split into `Algebra1_Concept.pdf` and
+`Geometry_Concept.docx`. Claude treats them as one course and can even
+write a single question that draws on both. When more than one guide is
+active, every lesson reference is prefixed with its alias (`Algebra1-24`)
+so a lesson number is never ambiguous about which file it's from; with only
+one guide, plain lesson numbers are used.
 
 ```
 Algebra 1/                          (or any name you like)
-├── Concept_Guide.pdf               you provide this
+├── Algebra1_Concept.pdf            you provide this (and/or more, see above)
+├── Geometry_Concept.docx           optional: a second guide, combined with the first
 ├── Problem_Set_Catalog.json        record of everything generated
 ├── Problem Sets YYYY-MM-DD/        created by the skill
 ├── Graded YYYY-MM-DD/              graded reports and scan copies
@@ -50,15 +62,17 @@ Algebra 1/                          (or any name you like)
 └── adhoc-solutions/                solutions for those screenshots
 ```
 
-Claude finds the folder by looking, in order, at:
+Claude finds your concept file(s) by looking, in order, at:
 
-1. the folder Claude was started in (if `Concept_Guide.pdf` is directly in
-   it),
-2. any immediate subfolder of the folder Claude was started in,
-3. a search of your home folder for `Concept_Guide.pdf`.
+1. any matching file you attached or uploaded in the chat,
+2. every matching file in the folder Claude was started in, or in one
+   immediate subfolder of it,
+3. a search of your home folder, only if neither of those finds anything.
 
-If it still cannot find it, it asks you where it is. In the Claude app, give
-Claude access to your study folder.
+If multiple folders have concept files (different subjects), Claude asks
+which one you mean, unless your request already names the subject. If
+*nothing* matches anywhere, it stops and asks you to attach a file or point
+to the right folder — it never assumes a default.
 
 ## How to use
 
@@ -71,9 +85,15 @@ example:
 
 Before creating anything, Claude:
 
-- tells you which concept guide it is using (or asks you for one),
-- asks where to put the files: the usual folder, another folder, or **just
-  give me a download** (nothing saved on your computer),
+- tells you which concept guide(s) it is using (or asks you for one — see
+  above),
+- **always asks where to put the files** — it never assumes or silently
+  uses some default output area. Options are: the usual folder, another
+  folder, or **a ZIP file with everything generated** (the PDF(s) plus the
+  catalog) as a download. If you don't give it a real folder, it defaults
+  to the ZIP and tells you plainly that it can't guarantee unique questions
+  next time unless you give it a folder, or re-upload that ZIP's catalog
+  file,
 - for problem sets, asks how many questions you want and whether to include
   solutions.
 
@@ -86,9 +106,9 @@ make a new one. A new set never repeats a question from an earlier set for
 that lesson: the style and concept stay the same, but the actual questions
 are new. Solving the same screenshot twice works the same way.
 
-If you only use downloads and have no study folder, Claude also gives you
-the updated catalog file to download. Upload it next time so it can keep
-questions unique.
+If you only ever use the ZIP option and have no study folder, the updated
+catalog file is always included inside the zip. Upload it next time so
+Claude can keep questions unique instead of starting from zero history.
 
 ## Print, solve, scan, grade
 
@@ -105,7 +125,8 @@ questions unique.
    answer key, then asks:
    - **Grading style:** final answer only (recommended), or final answer
      plus work, with half credit for a right method with a small slip;
-   - where to put the report (or just give a download).
+   - where to put the report — the usual folder, another folder, or a ZIP
+     with the report, the scan copy, and the catalog.
 5. You get a score, a report PDF listing what Claude read for each answer
    next to the correct answer, and short notes on each mistake.
 
@@ -138,9 +159,14 @@ In Claude Code, typing `/sat-practice-builder` suggests the arguments it
 takes (lesson, difficulty, count) as you type; anywhere else, just say what
 you want in plain language and Claude asks for anything missing.
 
+If more than one concept guide is active, scope spans all of them (lessons
+1-49 means lesson 1-49 of every active guide), and a question may combine a
+concept from one guide with one from another.
+
 Each question shows:
 - the lesson(s) its concept comes from, under the question number (same
-  style as `problem-set-builder`'s lesson references);
+  style as `problem-set-builder`'s lesson references, including the alias
+  prefix when more than one guide is active);
 - an *(Easy)*, *(Medium)*, or *(Hard)* tag right after the question, in
   italics, smaller than body text;
 - for multiple choice (most questions): four lettered choices, where every
@@ -175,5 +201,6 @@ represents, not just the right answer.
 | Scan copy | `Graded YYYY-MM-DD/` | `Lesson<N>_Scan_<YYYY-MM-DD>.<ext>` |
 | SAT practice set | `SAT Practice YYYY-MM-DD/` | `SAT_Practice_<scope>_<YYYY-MM-DD>.pdf` |
 
-These are the usual locations; you can pick another folder or a download
-instead. Files are never overwritten; a repeat gets `_01`, `_02`, and so on.
+These are the usual locations; you can pick another folder, or a ZIP of
+everything generated, instead. Files are never overwritten; a repeat gets
+`_01`, `_02`, and so on.
