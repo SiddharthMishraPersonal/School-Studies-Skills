@@ -97,6 +97,7 @@ Each `problem_sets` entry:
   "question_pages": "1-2",
   "solution_pages": "3-4",
   "questions": ["Solve for x: 3x + 5 = 20", "..."],
+  "lesson_refs": [[34], [34, 12], "..."],
   "answers": [
     {"n": 1, "answer": "x = 5", "accept": ["5", "x=5"], "simplest_form_required": false},
     "..."
@@ -109,6 +110,14 @@ Each `problem_sets` entry:
 file name). `questions` holds the full text of every question, in order, in
 plain text (exponents may be written `x^2` here). Always store it, even for
 downloads, because it is what keeps future sets unique.
+
+`lesson_refs` is the lesson-number citation printed under each question's
+number, one entry per question in the same order: a list of the lesson
+numbers whose concept that specific question draws on. The target lesson N
+is always included; add any other lesson numbers only when that particular
+question actually leans on a prerequisite skill from an earlier lesson (per
+the "Prerequisites only as support" rule below). Most questions will just be
+`[N]`.
 
 `answers` is the answer key, one entry per question in the same order:
 `answer` is the final answer as it would be printed, `accept` lists other
@@ -130,7 +139,9 @@ Each `solved_pages` entry: `lesson` (or null), `created`, `image_sha256`
 `<base>/Problem Sets */` (or the chosen output folder) for the target lesson
 but are missing from the catalog, extract their question text (for example
 with `pdftotext` or `pypdf`), add entries for them, and treat them like any
-other catalog entry.
+other catalog entry. Older PDFs made before this skill printed lesson
+references won't have one to extract; leave `lesson_refs` empty (`[]`) for
+those questions rather than guessing.
 
 # Shared step 3: Confirm where the output goes (always, before creating files)
 
@@ -214,6 +225,13 @@ concept.
 - **Prerequisites only as support.** A question may use skills from lessons
   1 to N-1 when lesson N's concept needs them, but never a skill from a
   lesson after N.
+- **Lesson reference per question.** As you write each question, note which
+  lesson(s) its concept actually comes from: lesson N, plus the specific
+  earlier lesson number for any prerequisite skill that question leans on
+  (for example, a lesson 47 question needing lesson 31's rule to simplify a
+  step gets `[47, 31]`; a plain lesson 47 question gets `[47]`). This is what
+  gets printed under the question number (see A4) and stored in the
+  catalog's `lesson_refs`.
 - **Difficulty ramp**, easiest to hardest:
   - first third: direct, one-step applications of the key rule, close to the
     guide's example;
@@ -270,13 +288,22 @@ handwriting is easy to find and read.
   title, a Name / Date / Score ___ / Q line, and one instruction line: "Show
   your work. Write your final answer on the Answer line." Then the numbered
   questions 1 to Q, with no answers or hints.
+  - **Lesson reference under the question number**, the way a Saxon-style
+    textbook prints it: directly beneath the question's number (in the same
+    narrow left-margin column as the number, not beside the question text),
+    put its `lesson_refs` for that question in parentheses — a single number
+    for one lesson (`(31)`), or comma-separated with no spaces for several
+    (`(24,65,99)`). Set this in *italic*, one point smaller than the body
+    text (for example 11 pt on 12 pt body). It is a citation, not part of
+    the question: never read it aloud as something to solve, and never let
+    it collide with or run into the question text to its right.
   - Under each question, blank work space (at least about 1.5 inches, more
     for multi-step and word problems).
   - At the bottom of each question's space, a labelled answer line at the
     right: `Answer: ______________________` (long enough for a fraction or
     an expression).
-  - Never split a question, its work space or its answer line across two
-    pages.
+  - Never split a question, its work space, its answer line or its lesson
+    reference across two pages.
 - **Scan-friendly layout:** black text on a white background only (no grey
   shading, coloured boxes or background images), margins of at least 0.75
   inch on every side, body text at least 12 pt, and nothing printed near the
@@ -290,9 +317,9 @@ handwriting is easy to find and read.
 
 ## A5: Update the catalog and reply
 
-Add the new set to the catalog (with its ID, all its question texts and the
-answer key) and save the catalog as described in Shared steps 2 and 3. Then
-tell the user:
+Add the new set to the catalog (with its ID, all its question texts, their
+`lesson_refs` and the answer key) and save the catalog as described in
+Shared steps 2 and 3. Then tell the user:
 
 - where the PDF is (full path, or that it is ready to download) and its set
   ID;
